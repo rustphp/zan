@@ -17,14 +17,6 @@
             "src/Utilities/helpers.php"
         ]
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Zan\\Framework\\Test\\": "test/"
-        },
-        "classmap": [
-            "test/TestCase.php"
-        ]
-    },
     "config": {
         "preferred-install": "dist",
         "secure-http": false
