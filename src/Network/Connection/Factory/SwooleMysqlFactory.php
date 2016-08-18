@@ -2,6 +2,7 @@
 namespace Zan\Framework\Network\Connection\Factory;
 use Zan\Framework\Contract\Network\ConnectionFactory;
 use \swoole_mysql as SwooleMysql;
+use Zan\Framework\Network\Connection\Driver\SwooleMysqlConnection;
 
 class SwooleMysqlFactory implements ConnectionFactory {
     /**
