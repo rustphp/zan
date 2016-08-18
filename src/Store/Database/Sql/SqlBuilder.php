@@ -288,6 +288,9 @@ class SqlBuilder
             return $this;
         }
         $parseWhere = $this->parseWhereStyleData($where, 'and');
+        if(!empty($parseWhere)){
+            $parseWhere = 'WHERE '.$parseWhere;
+        }
         $this->sqlMap['sql'] = $this->replaceSqlLabel($this->sqlMap['sql'], 'where', $parseWhere);
         return $this;
     }
@@ -316,7 +319,7 @@ class SqlBuilder
             }
             $clauses[] = $this->formatColumn($column) . ' ' . $condition . $this->formatValue($value);
         }
-        return implode(" $andOr ", $clauses);
+        return trim(implode(" $andOr ", $clauses)," $andOr ");
     }
 
     private function parseWhereIn($column, $condition, $value)
