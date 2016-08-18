@@ -19,13 +19,12 @@ namespace Zan\Framework\Network\Connection;
 
 
 use Zan\Framework\Foundation\Core\Config;
-use Zan\Framework\Network\Connection\Factory\KVStore;
-use Zan\Framework\Network\Connection\Factory\NovaClient;
 use Zan\Framework\Network\Connection\Factory\Redis;
 use Zan\Framework\Network\Connection\Factory\Syslog;
 use Zan\Framework\Utilities\DesignPattern\Singleton;
 use Zan\Framework\Network\Connection\Factory\Http;
 use Zan\Framework\Network\Connection\Factory\Mysqli;
+use com\imcjj\youzan\SwooleMysqlFactory;
 
 
 class ConnectionInitiator
@@ -109,6 +108,9 @@ class ConnectionInitiator
                 break;
             case 'Mysqli':
                 $factory = new Mysqli($config);
+                break;
+            case 'Swoole_mysql':
+                $factory = new SwooleMysqlFactory($config);
                 break;
             default:
                 break;
