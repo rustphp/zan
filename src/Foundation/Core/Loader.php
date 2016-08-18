@@ -11,6 +11,7 @@ namespace Zan\Framework\Foundation\Core;
 
 use Zan\Framework\Utilities\DesignPattern\Singleton;
 use Zan\Framework\Utilities\Types\Dir;
+use Zan\Framework\Foundation\Exception\System\InvalidArgumentException;
 
 class Loader
 {
