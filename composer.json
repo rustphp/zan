@@ -20,7 +20,5 @@
     "config": {
         "preferred-install": "dist",
         "secure-http": false
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
+    }
 }
