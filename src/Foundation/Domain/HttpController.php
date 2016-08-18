@@ -1,7 +1,5 @@
 <?php
-
 namespace Zan\Framework\Foundation\Domain;
-
 use Zan\Framework\Foundation\Core\Config;
 use Zan\Framework\Network\Http\Response\RedirectResponse;
 use Zan\Framework\Network\Http\Response\Response;
@@ -11,74 +9,67 @@ use Zan\Framework\Contract\Network\Request;
 use Zan\Framework\Utilities\DesignPattern\Context;
 use Zan\Framework\Foundation\View\JsVar;
 
-class HttpController extends Controller
-{
-    protected $viewData = [];
-    protected $jsVar = null;
+class HttpController extends Controller {
+    protected $viewData   = [];
+    protected $jsVar      = null;
+    private   $isRedirect = FALSE;
 
-    public function __construct(Request $request, Context $context)
-    {
+    public function __construct(Request $request, Context $context) {
         parent::__construct($request, $context);
         $this->jsVar = new JsVar();
     }
 
-    public function setJsVar($key, $value)
-    {
+    public function setJsVar($key, $value) {
         $this->jsVar->setBusiness($key, $value);
     }
 
-    public function setDomains(array $domains)
-    {
+    public function setDomains(array $domains) {
         $this->jsVar->setDomain($domains);
     }
 
-    public function getJsVars()
-    {
+    public function getJsVars() {
         return $this->jsVar->get();
     }
 
-    public function output($content)
-    {
+    public function output($content) {
         return new Response($content);
     }
 
-    public function display($tpl)
-    {
+    public function display($tpl) {
         $this->viewData['_js_var'] = $this->getJsVars();
         $content = View::display($tpl, $this->viewData);
         return $this->output($content);
     }
 
-    public function render($tpl)
-    {
+    public function render($tpl) {
         $this->viewData['_js_var'] = $this->getJsVars();
         return View::display($tpl, $this->viewData);
     }
 
-    public function assign($key, $value)
-    {
+    public function assign($key, $value) {
         $this->viewData[$key] = $value;
     }
 
-    public function r($code, $msg, $data)
-    {
+    public function r($code, $msg, $data) {
         $data = [
             'code' => $code,
-            'msg'  => $msg,
+            'msg' => $msg,
             'data' => $data,
         ];
         return new JsonResponse($data);
     }
 
-    public function redirect($url, $code = 302)
-    {
+    public function redirect($url, $code = 302) {
+        $this->isRedirect = true;
         return RedirectResponse::create($url, $code);
     }
 
-    protected function dispatch($action, $mode = 0)
-    {
+    public function isRedirect() {
+        return $this->isRedirect;
+    }
+
+    protected function dispatch($action, $mode = 0) {
         switch ($mode) {
         }
     }
-
 }

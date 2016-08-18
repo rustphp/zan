@@ -42,7 +42,10 @@ class Dispatcher
         if(method_exists($controller,'init')){
             yield $controller->init();
         }
-        yield $controller->$action();
+        //当init中有跳转逻辑时 不再执行$action方法
+        if (!method_exists($controller, 'isRedirect') || !$controller->isRedirect()) {
+            yield $controller->$action();
+        }
     }
 
     private function getControllerClass($controllerName)
