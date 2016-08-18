@@ -27,19 +27,6 @@ class HttpController extends Controller
         $this->jsVar->setBusiness($key, $value);
     }
 
-    public function setShare($cover, $title, $desc)
-    {
-        $this->jsVar->setShare('cover', trim($cover));
-        $this->jsVar->setShare('title', trim($title));
-        $this->jsVar->setShare('desc', trim($desc));
-    }
-
-    public function setShareData(array $shareItems){
-        foreach($shareItems as $key=>$item){
-            $this->jsVar->setShare($key, $item);
-        }
-    }
-
     public function setDomains(array $domains)
     {
         $this->jsVar->setDomain($domains);
