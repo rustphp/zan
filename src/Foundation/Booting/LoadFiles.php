@@ -19,7 +19,7 @@ class LoadFiles implements Bootable
     {
         $basePath = $app->getBasePath();
         $paths = [
-            $basePath . '/vendor/zanphp',
+            $basePath . '/vendor/rustphp',
             $basePath . '/src',
         ];
 

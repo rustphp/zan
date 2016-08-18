@@ -24,7 +24,7 @@ use Zan\Framework\Network\Connection\Factory\Syslog;
 use Zan\Framework\Utilities\DesignPattern\Singleton;
 use Zan\Framework\Network\Connection\Factory\Http;
 use Zan\Framework\Network\Connection\Factory\Mysqli;
-use com\imcjj\youzan\SwooleMysqlFactory;
+use Zan\Framework\Network\Connection\Factory\SwooleMysqlFactory;
 
 
 class ConnectionInitiator
@@ -32,10 +32,11 @@ class ConnectionInitiator
     use Singleton;
 
     private $engineMap = [
-        'mysqli', 
-        'http', 
-        'redis', 
-        'syslog', 
+        'mysqli',
+        'http',
+        'redis',
+        'syslog',
+        'swoole_mysql'
     ];
 
     public $directory = '';
@@ -48,6 +49,7 @@ class ConnectionInitiator
 
     /**
      * @param $directory
+     * @param $server
      */
     public function init($directory, $server)
     {
@@ -97,23 +99,24 @@ class ConnectionInitiator
     private function initPool($factoryType, $config)
     {
         switch ($factoryType) {
-            case 'Redis':
-                $factory = new Redis($config);
-                break;
-            case 'Syslog':
-                $factory = new Syslog($config);
-                break;
-            case 'Http':
-                $factory = new Http($config);
-                break;
-            case 'Mysqli':
-                $factory = new Mysqli($config);
-                break;
-            case 'Swoole_mysql':
-                $factory = new SwooleMysqlFactory($config);
-                break;
-            default:
-                break;
+        case 'Redis':
+            $factory = new Redis($config);
+            break;
+        case 'Syslog':
+            $factory = new Syslog($config);
+            break;
+        case 'Http':
+            $factory = new Http($config);
+            break;
+        case 'Mysqli':
+            $factory = new Mysqli($config);
+            break;
+        case 'Swoole_mysql':
+            $factory = new SwooleMysqlFactory($config);
+            break;
+        default:
+            $factory = NULL;
+            break;
         }
         $connectionPool = new Pool($factory, $config, $factoryType);
         ConnectionManager::getInstance()->addPool($config['pool']['pool_name'], $connectionPool);
