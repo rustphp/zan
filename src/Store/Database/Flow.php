@@ -29,7 +29,7 @@ class Flow
 
     private $engineMap = [
         'Mysqli' => 'Zan\Framework\Store\Database\Mysql\Mysqli',
-        'Swoole_mysql'=>'com\imcjj\youzan\SwooleMysqlDriver',
+        'Swoole_mysql'=>'Zan\Framework\Store\Database\Mysql\SwooleMysqlDriver',
     ];
 
     public function query($sid, $data, $options)
