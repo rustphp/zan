@@ -41,8 +41,4 @@ class ConnectionConfig {
         self::$data = [];
     }
 
-    private static function getConfigFile()
-    {
-
-    }
 }
