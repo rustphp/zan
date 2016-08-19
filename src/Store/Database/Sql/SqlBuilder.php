@@ -60,6 +60,7 @@ class SqlBuilder
         if (isset($data['count'])) {
             $this->parseCount($data);
         }
+        $this->parseBinds($data);
         $this->parseVars($data);
         $this->parseWhere($data);
         $this->parseAnds($data);
@@ -68,6 +69,33 @@ class SqlBuilder
         $this->parseGroupBy($data);
         $this->parseOrderBy($data);
         $this->parseLimit($data);
+        return $this;
+    }
+
+    /**
+     * 处理监听
+     * @param $data
+     * @return $this
+     */
+    private function parseBinds($data) {
+        if (!$data || !isset($data['binds']) || !$data['binds'] || !is_array($data['binds'])) {
+            return $this;
+        }
+        $binds = $data['binds'];
+        if (isset($binds[0]) && $binds[0]) {
+            foreach ($binds as $bind) {
+                $this->sqlMap['sql'] = preg_replace('/\?/', $this->formatValue($bind), $this->sqlMap['sql'], 1);
+            }
+            return $this;
+        }
+        $patterns = array_map(function ($name) {
+            return '#' . str_replace(':', '\\:', $name) . '#';
+        }, array_keys($binds));
+        $values = array_map(function ($value) {
+            $value = Validator::realEscape($value);
+            return is_int($value) ? $value : "'" . $value . "'";
+        }, array_values($binds));
+        $this->sqlMap['sql'] = preg_replace($patterns, $values, $this->sqlMap['sql']);
         return $this;
     }
 

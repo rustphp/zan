@@ -35,25 +35,8 @@ class SqlMap
 
     public function getSql($sid, $data = [], $options = [])
     {
-        //support sql binds
-        $binds = isset($options['binds'])&&is_array($options['binds'])?$options['binds']:[];
-        unset($options['binds']);
         $sqlMap = $this->getSqlMapBySid($sid);
         $sqlMap = $this->builder($sqlMap, $data, $options);
-        if(!$binds){
-            return $sqlMap;
-        }
-        $sql = isset($sqlMap['sql']) ? $sqlMap['sql'] : '';
-        if ($sql) {
-            $patterns = array_map(function ($name) {
-                return '#' . str_replace(':', '\\:', $name).'#';
-            }, array_keys($binds));
-            $values = array_map(function($value){
-                $value = Validator::realEscape($value);
-                return is_int($value) ? $value : "'" . $value . "'";
-            },array_values($binds));
-            $sqlMap['sql'] = preg_replace($patterns, $values, $sql);
-        }
         return $sqlMap;
     }
 

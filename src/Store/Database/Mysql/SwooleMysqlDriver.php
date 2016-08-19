@@ -50,6 +50,11 @@ class SwooleMysqlDriver implements DriverInterface {
         var_dump($sql);
         $this->sql = $sql;
         $swoole_mysql = $this->connection->getSocket();
+        if (isset($swoole_mysql->connect_error) && $swoole_mysql->connect_error) {
+            $this->connection->close();
+            yield $this;
+            return;
+        }
         $swoole_mysql->query($this->sql, [$this, 'onSqlReady']);
         Timer::after($timeout, [$this, 'onQueryTimeout'], spl_object_hash($this));
         yield $this;
