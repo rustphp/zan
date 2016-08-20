@@ -16,18 +16,16 @@
  */
 namespace Zan\Framework\Network\Http;
 
-use swoole_http_request as SwooleHttpRequest;
-use swoole_http_response as SwooleHttpResponse;
+use \swoole_http_request as SwooleHttpRequest;
+use \swoole_http_response as SwooleHttpResponse;
 use Zan\Framework\Foundation\Core\Config;
 use Zan\Framework\Foundation\Core\Debug;
-use Zan\Framework\Foundation\Core\Event;
 use Zan\Framework\Foundation\Coroutine\Signal;
 use Zan\Framework\Foundation\Coroutine\Task;
 use Zan\Framework\Network\Http\Response\BaseResponse;
 use Zan\Framework\Network\Http\Response\InternalErrorResponse;
 use Zan\Framework\Network\Http\Routing\Router;
 use Zan\Framework\Network\Server\Middleware\MiddlewareManager;
-use Zan\Framework\Network\Server\Monitor\Worker;
 use Zan\Framework\Network\Server\Timer\Timer;
 use Zan\Framework\Utilities\DesignPattern\Context;
 use Zan\Framework\Network\Http\Request\Request;
@@ -36,11 +34,17 @@ use Zan\Framework\Utilities\Types\Time;
 class RequestHandler
 {
     private $context = null;
+    /**
+     * @var \Zan\Framework\Network\Server\Middleware\MiddlewareManager
+     */
     private $middleWareManager = null;
+    /**
+     * @var \Zan\Framework\Foundation\Coroutine\Task
+     */
     private $task = null;
     private $event = null;
 
-    const DEFAULT_TIMEOUT = 30 * 1000;
+    const DEFAULT_TIMEOUT = 30000;
 
     public function __construct()
     {

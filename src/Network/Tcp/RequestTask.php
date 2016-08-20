@@ -18,7 +18,6 @@
 namespace Zan\Framework\Network\Tcp;
 
 use Zan\Framework\Network\Server\Middleware\MiddlewareManager;
-use Zan\Framework\Network\Server\Monitor\Worker;
 use Zan\Framework\Utilities\DesignPattern\Context;
 
 class RequestTask {
