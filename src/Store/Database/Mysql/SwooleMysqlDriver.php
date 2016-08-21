@@ -61,7 +61,7 @@ class SwooleMysqlDriver implements DriverInterface {
     }
 
     /**
-     * @param $link
+     * @param \swoole_mysql $link
      * @param $result
      * @return DbResultInterface
      */
@@ -69,15 +69,15 @@ class SwooleMysqlDriver implements DriverInterface {
         Timer::clearAfterJob(spl_object_hash($this));
         $exception = null;
         if ($result === false) {
-            if (in_array($link->_errno, [2013, 2006])) {
+            if (in_array($link->errno, [2013, 2006])) {
                 $this->connection->close();
                 $exception = new MysqliConnectionLostException();
-            } elseif ($link->_errno == 1064) {
-                $error = $link->_error;
+            } elseif ($link->errno == 1064) {
+                $error = $link->error;
                 $this->connection->release();
                 $exception = new MysqliSqlSyntaxException($error);
             } else {
-                $error = $link->_error;
+                $error = $link->error;
                 $this->connection->release();
                 $exception = new MysqliQueryException($error);
             }
