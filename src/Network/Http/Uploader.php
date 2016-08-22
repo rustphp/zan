@@ -45,6 +45,10 @@ class Uploader {
     /**
      * 调用该方法上传文件
      * @param  string $fileFile 上传文件的表单名称
+     */
+    /**
+     * @param string $fileField 上传域名称
+     * @param string|array $allowType 允许上传的文件
      * @return bool        如果上传成功返回数true
      */
     public function doUpload($fileField, $allowType = NULL) {
