@@ -4,9 +4,6 @@ namespace Zan\Framework\Network\Http;
  * Class Uploader
  */
 class Uploader {
-    /**
-     * @var \Zan\Framework\Network\Http\Bag\FileBag
-     */
     private $files;
     private $path       = "./uploads";          //上传文件保存的路径
     private $allowType  = ['bin']; //设置限制上传文件的类型
@@ -136,7 +133,7 @@ class Uploader {
 
     /**
      * 获取上传后的文件名称
-     * @param  void   没有参数
+     *
      * @return string 上传后，新文件的名称， 如果是多文件上传返回数组
      */
     public function getFileName() {
@@ -145,7 +142,7 @@ class Uploader {
 
     /**
      * 上传失败后，调用该方法则返回，上传出错信息
-     * @param  void   没有参数
+     *
      * @return string  返回上传文件出错的信息报告，如果是多文件上传返回数组
      */
     public function getErrorMsg() {
@@ -154,7 +151,7 @@ class Uploader {
 
     /* 设置上传出错信息 */
     public function getError() {
-        $str = "上传文件<span color='red'>{$this->originName}</span>时出错 : ";
+        $str = "上传文件<span style='color:red'>{$this->originName}</span>时出错 : ";
         switch ($this->errorNum) {
         case 4:
             $str .= "没有文件被上传";
