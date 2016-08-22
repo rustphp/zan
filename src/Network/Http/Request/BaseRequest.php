@@ -14,6 +14,7 @@ namespace Zan\Framework\Network\Http\Request;
 use Zan\Framework\Network\Http\Bag\HeaderBag;
 use Zan\Framework\Network\Http\Bag\ParameterBag;
 use Zan\Framework\Network\Http\Bag\ServerBag;
+use Zan\Framework\Network\Http\Bag\FileBag;
 use Zan\Framework\Network\Http\Request\AcceptHeader\AcceptHeader;
 use Zan\Framework\Utilities\Types\Ip;
 
@@ -114,7 +115,7 @@ class BaseRequest
     /**
      * Uploaded files ($_FILES).
      *
-     * @var array
+     * @var \Zan\Framework\Network\Http\Bag\FileBag
      */
     public $files;
 
@@ -239,7 +240,7 @@ class BaseRequest
         $this->query = new ParameterBag($query);
         $this->attributes = new ParameterBag($attributes);
         $this->cookies = new ParameterBag($cookies);
-        //$this->files = new FileBag($files);
+        $this->files = new FileBag($files);
         $this->server = new ServerBag($server);
         $this->headers = new HeaderBag($this->server->getHeaders());
 
