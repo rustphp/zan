@@ -19,6 +19,7 @@ namespace Zan\Framework\Network\Http\Request;
 use swoole_http_request as SwooleHttpRequest;
 use Zan\Framework\Utilities\Types\Arr;
 use Zan\Framework\Utilities\Types\Str;
+use Zan\Framework\Utilities\Tools\SwooleFormElements;
 use Zan\Framework\Contract\Foundation\Arrayable;
 use Zan\Framework\Network\Http\Bag\ParameterBag;
 use Zan\Framework\Contract\Network\Request as RequestContract;
@@ -45,11 +46,11 @@ class Request extends BaseRequest implements Arrayable, RequestContract
      */
     public static function createFromSwooleHttpRequest(SwooleHttpRequest $swooleRequest)
     {
-        $get = isset($swooleRequest->get) ? $swooleRequest->get : [];
-        $post = isset($swooleRequest->post) ? $swooleRequest->post : [];
+        $get = SwooleFormElements::toArray(isset($swooleRequest->get) ? $swooleRequest->get : []);
+        $post = SwooleFormElements::toArray(isset($swooleRequest->post) ? $swooleRequest->post : []);
         $attributes = [];
         $cookie = isset($swooleRequest->cookie) ? $swooleRequest->cookie : [];
-        $files = isset($swooleRequest->files) ? $swooleRequest->files : [];
+        $files = SwooleFormElements::toArray(isset($swooleRequest->files) ? $swooleRequest->files : []);
         $server = isset($swooleRequest->server) ? array_change_key_case($swooleRequest->server, CASE_UPPER) : [];
         if (isset($swooleRequest->header)) {
             foreach ($swooleRequest->header as $key => $value) {
