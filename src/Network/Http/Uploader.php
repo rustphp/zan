@@ -8,11 +8,13 @@ final class Uploader {
     const STATE_SUCCESS = 0;//上传成功
     const STATE_NONE    = 1;//没有上传
     const STATE_ANY     = 2;//部分上传成功
+    /*
     private $status = [
-        STATE_SUCCESS => '上传成功',
-        STATE_NONE    => '上传失败',
-        STATE_ANY     => '部分文件上传成功',
+        self::STATE_SUCCESS => '上传成功',
+        self::STATE_NONE    => '上传失败',
+        self::STATE_ANY     => '部分文件上传成功',
     ];
+    */
     //上传错误码
     const ERR_NO_UPLOADED            = 1;//没有上传
     const ERR_NEED_UPLOAD_PATH       = 2;//必须指定上传路径
@@ -33,7 +35,7 @@ final class Uploader {
     /**
      * Uploader constructor.
      * @param       $files
-     * @param array $options
+     * @param array $config
      */
     public function __construct($files, $config = []) {
         $this->files = $files;
@@ -47,13 +49,14 @@ final class Uploader {
 
     /**
      * 调用该方法上传文件
-     * @return bool        如果上传成功返回数true
+     *
+     * @return array
      */
     public function doUpload() {
         if (!$this->checkUploaded()) {
             return $this->result;
         }
-        foreach ($this->files as $form_element => $file) {
+        foreach ($this->files as $file) {
             if (!$file || !is_array($file)) {
                 //TODO:fixeed error
                 continue;
@@ -79,7 +82,7 @@ final class Uploader {
             return FALSE;
         }
         if (!file_exists($config['path']) || !is_writable($config['path'])) {
-            if (!mkdir($this->path, 0755, TRUE)) {
+            if (!mkdir($config['path'], 0755, TRUE)) {
                 $this->setError(Uploader::ERR_UPLOAD_PATH_NOT_EXIST);
                 return FALSE;
             }
@@ -97,7 +100,7 @@ final class Uploader {
             Uploader::ERR_NEED_UPLOAD_PATH      => '必须指定上传路径',
             Uploader::ERR_UPLOAD_PATH_NOT_EXIST => '上传路径不存在(自动创建失败,请手动创建并授权)',
         ];
-        $msg = isset($messages[$code]) ? $message[$code] : '未知错误(' . $code . ')';
+        $msg = isset($messages[$code]) ? $messages[$code] : '未知错误(' . $code . ')';
         $errors = isset($this->result['error']) ? $this->result['error'] : [];
         $error = isset($errors[$code]) ? $errors[$code] : NULL;
         if (!$error) {
@@ -108,6 +111,7 @@ final class Uploader {
 
     /**
      * 上传文件
+     *
      * @param array  $file
      */
     protected function upload($file) {
@@ -115,16 +119,36 @@ final class Uploader {
         $names = $file['name'];
         $tmp_names = $file['tmp_name'];
         $sizes = $file['size'];
-        $errors = $file['error'];
+        //TODO:
+        //$errors = $file['error'];
         $upload_errors = [];
         $is_check_extension = isset($config['allowedTypes']) && $config['allowedTypes'] ? TRUE : FALSE;
+        //单文件
+        if(!is_array($names)) {
+            $file_info = new UploadFileInfo;
+            $file_info->originName = $names;
+            $file_info->size = $sizes;
+            $file_info->sizeInfo = $this->formatFileSize($sizes);
+            $extensions = explode('.', $names);
+            $file_type = is_array($extensions) && $extensions ? strtolower(array_pop($extensions)) : '';
+            $file_info->extension = $file_type;
+            $file_info->tmpName = $tmp_names;
+            $this->copyFile($file_info, $upload_errors);
+            //上传失败
+            if ($upload_errors) {
+                $this->result['error'][Uploader::ERR_UPLOAD_INVALIDS] = $upload_errors;
+            }
+            return;
+        }
         for ($i = 0; $i < count($names); $i++) {
             $name = $names[$i];
             $tmp_name = $tmp_names[$i];
             $file_size = $sizes[$i];
-            $error = $errors[$i];
+            //TODO:
+            //$error = $errors[$i];
             $extensions = explode('.', $name);
             $file_type = is_array($extensions) && $extensions ? strtolower(array_pop($extensions)) : '';
+            //TODO:
             //文件类型不匹配
             if ($is_check_extension && !in_array($file_type, $config['allowedTypes'])) {
                 $upload_errors[$name] = sprintf('文件%s上传失败(不支持的文件格式)', $name);
@@ -164,7 +188,7 @@ final class Uploader {
         $path = rtrim($config['path'], '/') . '/';
         $new_file_name = $fileInfo->originName;
         if (isset($config['isRandNamed']) && $config['isRandNamed']) {
-            $new_file_name = date('YmdHis') . '_' . rand(100, 999);
+            $new_file_name = date('YmdHis') . '_' . rand(100, 999).'.'.$fileInfo->extension;
         }
         $path .= $new_file_name;
         $fileInfo->name = $new_file_name;
@@ -179,9 +203,33 @@ final class Uploader {
                 array_push($this->result, $fileInfo);
                 return TRUE;
             }
-            $errors[$fileInfo->originName] = spritf('文件%s移动失败', $fileInfo->originName);
+            $errors[$fileInfo->originName] = sprintf('文件%s移动失败', $fileInfo->originName);
         }
-        $errors[$fileInfo->originName] = spritf('文件%s拷贝失败', $fileInfo->originName);
+        $errors[$fileInfo->originName] = sprintf('文件%s拷贝失败', $fileInfo->originName);
         return FALSE;
+    }
+
+    /**
+     * @param $file_size
+     * @return string
+     */
+    protected function formatFileSize($file_size) {
+        $prec = 3;
+        $size = round(abs($file_size));
+        $units = [
+            0 => " B ",
+            1 => " KB",
+            2 => " MB",
+            3 => " GB",
+            4 => " TB",
+        ];
+        if (!$size) {
+            return str_repeat(" ", $prec) . "0$units[0]";
+        }
+        $unit = min(4, floor(log($size) / log(2) / 10));
+        $size = $size * pow(2, -10 * $unit);
+        $digi = $prec - 1 - floor(log($size) / log(10));
+        $size = round($size * pow(10, $digi)) * pow(10, -$digi);
+        return $size . $units[$unit];
     }
 }
