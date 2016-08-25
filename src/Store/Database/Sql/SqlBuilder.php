@@ -159,6 +159,7 @@ class SqlBuilder
     {
         $this->parseUpdateData($data);
         $this->checkRequire($data);
+        $this->parseBinds($data);
         $this->parseVars($data);
         $this->parseWhere($data);
         $this->parseAnds($data);
@@ -173,6 +174,7 @@ class SqlBuilder
     private function delete($data)
     {
         $this->checkRequire($data);
+        $this->parseBinds($data);
         $this->parseVars($data);
         $this->parseWhere($data);
         $this->parseAnds($data);

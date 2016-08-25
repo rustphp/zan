@@ -194,6 +194,7 @@ final class Uploader {
         $fileInfo->name = $new_file_name;
         $fileInfo->path = $path;
         if (move_uploaded_file($fileInfo->tmpName, $path)) {
+            unset($fileInfo->tmpName);
             array_push($this->result, $fileInfo);
             return TRUE;
         }
