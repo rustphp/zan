@@ -16,10 +16,8 @@
  */
 namespace Zan\Framework\Network\Http\Routing;
 
-use Zan\Framework\Foundation\Core\Config;
 use Zan\Framework\Network\Http\Request\Request;
 use Zan\Framework\Utilities\DesignPattern\Singleton;
-use Zan\Framework\Utilities\DesignPattern\Context;
 
 class Router {
 
@@ -38,6 +36,11 @@ class Router {
         if(empty($url)) {
             return;
         }
+        $base_path = isset($this->config['base_path']) ? trim($this->config['base_path']) : NULL;
+        if ($base_path) {
+            $url = str_replace($base_path, $this->separator, $url);
+        }
+        var_dump($url);
         $this->url = ltrim($url, $this->separator);
         $this->removeIllegalString();
         $this->rules = UrlRule::getRules();
@@ -57,7 +60,7 @@ class Router {
     }
 
     public function route(Request $request)
-    {
+    {var_dump($this->config);
         $requestUri = $request->server->get('REQUEST_URI');
         if(preg_match('/\.ico$/i', $requestUri)){
             $requestUri = '';
@@ -85,7 +88,12 @@ class Router {
     private function parseRequestFormat($requestUri)
     {
         if(false === strpos($requestUri, '.')) {
-            return $this->setDefaultFormat();
+            $this->setDefaultFormat();
+            return;
+        }
+        $base_path = isset($this->config['base_path']) ? trim($this->config['base_path']) : NULL;
+        if ($base_path) {
+            $requestUri = str_replace($base_path, $this->separator, $requestUri);
         }
         $explodeArr = explode('.', $requestUri);
         $whiteList = isset($this->config['format_whitelist']) ? $this->config['format_whitelist'] : array();
@@ -94,20 +102,23 @@ class Router {
     }
 
     private function repairRoute()
-    {
+    {var_dump($this->route);
         $path = array_filter(explode($this->separator, $this->route));
+        var_dump($path);
         $pathCount = count($path);
         switch($pathCount)
         {
-            case 0:
-                $this->setDefaultRoute();
-                break;
-            case 1:
-                $this->setDefaultControllerAndDefaultAction();
-                break;
-            case 2:
-                $this->setDefaultAction();
-                break;
+        case 0:
+            $this->setDefaultRoute();
+            var_dump('set default route');
+            break;
+        case 1:
+            $this->setDefaultControllerAndDefaultAction();
+            var_dump('set default controller and default action');
+            break;
+        case 2:
+            $this->setDefaultAction();
+            break;
         }
     }
 
