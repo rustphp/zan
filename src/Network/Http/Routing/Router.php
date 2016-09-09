@@ -40,7 +40,6 @@ class Router {
         if ($base_path) {
             $url = str_replace($base_path, $this->separator, $url);
         }
-        var_dump($url);
         $this->url = ltrim($url, $this->separator);
         $this->removeIllegalString();
         $this->rules = UrlRule::getRules();
@@ -60,7 +59,7 @@ class Router {
     }
 
     public function route(Request $request)
-    {var_dump($this->config);
+    {
         $requestUri = $request->server->get('REQUEST_URI');
         if(preg_match('/\.ico$/i', $requestUri)){
             $requestUri = '';
@@ -102,19 +101,16 @@ class Router {
     }
 
     private function repairRoute()
-    {var_dump($this->route);
+    {
         $path = array_filter(explode($this->separator, $this->route));
-        var_dump($path);
         $pathCount = count($path);
         switch($pathCount)
         {
         case 0:
             $this->setDefaultRoute();
-            var_dump('set default route');
             break;
         case 1:
             $this->setDefaultControllerAndDefaultAction();
-            var_dump('set default controller and default action');
             break;
         case 2:
             $this->setDefaultAction();

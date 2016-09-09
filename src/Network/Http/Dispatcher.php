@@ -29,6 +29,10 @@ class Dispatcher
         $controllerName = $context->get('controller_name');
         $action = $context->get('action_name');
 
+        if(!$controllerName && !$action){
+            throw new RuntimeException("controller and actionnot found");
+        }
+
         $controller = $this->getControllerClass($controllerName);
         if(!class_exists($controller)) {
             throw new RuntimeException("controller:{$controller} not found");
