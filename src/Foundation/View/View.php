@@ -16,17 +16,15 @@
  */
 namespace Zan\Framework\Foundation\View;
 
-use Zan\Framework\Foundation\View\Layout;
-use Zan\Framework\Foundation\View\Tpl;
-use Zan\Framework\Foundation\View\Js;
-use Zan\Framework\Foundation\View\Css;
 use Zan\Framework\Foundation\Coroutine\Event;
 
 class View
 {
     private $_data = [];
     private $_tplPath = '';
-
+    /**
+     * @var Js|null
+     */
     private $_js = null;
     private $_css = null;
     private $_tpl = null;
@@ -54,7 +52,7 @@ class View
     public function render()
     {
         $this->_tpl->setViewVars($this->_getViewVars());
-        return $this->_js->replaceJS($this->_layout->render());
+        return $this->_js->replaceJs($this->_layout->render());
     }
 
     private function _getViewVars()
