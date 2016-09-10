@@ -16,11 +16,11 @@
  */
 namespace Zan\Framework\Store\Database;
 
-use Zan\Framework\Store\Database\Mysql\Mysqli;
 use Zan\Framework\Store\Database\Sql\SqlMap;
 use Zan\Framework\Store\Database\Sql\Table;
 use Zan\Framework\Network\Connection\ConnectionManager;
 use Zan\Framework\Contract\Network\Connection;
+use Zan\Framework\Store\Facade\Cache;
 
 class Flow
 {
@@ -35,12 +35,24 @@ class Flow
     public function query($sid, $data, $options)
     {
         $sqlMap = SqlMap::getInstance()->getSql($sid, $data, $options);
+        //get cached
+        $cache = isset($sqlMap['cache']) ? $sqlMap['cache'] : NULL;
+        $cached_result = (yield $this->parseCache($cache));
+        if ($cached_result['isNeed'] && isset($cached_result['result']) && $cached_result['result']) {
+            yield $cached_result['result'];
+            return;
+        }
         $database = Table::getInstance()->getDatabase($sqlMap['table']);
         $connection = (yield $this->getConnection($database));
         $driver = $this->getDriver($connection);
         $dbResult = (yield $driver->query($sqlMap['sql']));
         $resultFormatter = new ResultFormatter($dbResult, $sqlMap['result_type']);
-        yield $resultFormatter->format();
+        $result=(yield $resultFormatter->format());
+        //cached
+        if ($cached_result['isNeed']) {
+            yield Cache::set($cache['config'], $result, $cache['key']);
+        }
+        yield $result;
     }
 
     public function beginTransaction()
@@ -140,5 +152,33 @@ class Flow
         $connectionStack = new \SplStack();
         $connectionStack->push($connection);
         yield setContext(self::CONNECTION_STACK, $connectionStack);
+    }
+
+    /**
+     * parse cache
+     * @param $cache
+     * @return \Generator|void
+     */
+    private function parseCache($cache) {
+        $need_cached = (yield FALSE);
+        if ($cache && is_array($cache)) {
+            if (is_string($cache['key']) && '-' === substr($cache['key'], 0, 1)) {
+                $cache_key = substr($cache['key'], 0 - (strlen($cache['key']) - 1));
+                $removed = (yield Cache::remove($cache['config'], $cache_key));
+                yield ['isNeed' => $need_cached, 'removed' => $removed];
+                //TODO:if remove failed then log?
+                return;
+            }
+            $need_cached = (yield TRUE);
+        }
+        //read from cache
+        if ($need_cached) {
+            $result = (yield Cache::get($cache['config'], $cache['key']));
+            if ($result !== NULL) {
+                yield ['isNeed' => $need_cached, 'cached' => $result];
+                return;
+            }
+        }
+        yield ['isNeed' => $need_cached];
     }
 }

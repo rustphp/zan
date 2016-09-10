@@ -32,6 +32,20 @@ class RedisManager {
         $this->client = $connection->getSocket();
     }
 
+    /**
+     * del redis by key
+     * @param $key
+     * @return \Generator
+     */
+    public function del($key) {
+        $delResult = (yield NULL);
+        $this->client->DEL($key, function ($result, $success) use (&$delResult) {
+            $delResult = (yield $success);
+        });
+        $this->release();
+        yield $delResult;
+    }
+
     public function get($key) {
         $result = new RedisResult();
         $this->client->get($key, [$result, 'response']);

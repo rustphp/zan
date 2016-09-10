@@ -54,6 +54,22 @@ class Cache {
         }
     }
 
+    /**
+     * @param $configKey
+     * @param $keys
+     * @return \Generator|void
+     */
+    public static function remove($configKey, $keys) {
+        yield self::getRedisManager($configKey);
+        $cacheKey = self::getConfigCacheKey($configKey);
+        $realKey = self::getRealKey($cacheKey, $keys);
+        if (!empty($realKey)) {
+            yield self::$redis->del($realKey);;
+            return;
+        }
+        yield NULL;
+    }
+
     public static function set($configKey, $value, $keys)
     {
         yield self::getRedisManager($configKey);
