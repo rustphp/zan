@@ -31,7 +31,7 @@ class ExceptionHandlerChain
     public function handle(\Exception $e)
     {
         $logger = new FileLogger('error');
-        yield $logger->error($e->getMessage());
+        yield $logger->error($e);
         if (empty($this->handlerChain)) {
             //@TODO 输出到console
             return;
