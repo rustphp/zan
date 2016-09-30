@@ -23,7 +23,7 @@ class FileWriter implements ILogWriter, Async {
         if (!$path) {
             throw new InvalidArgumentException('Path not be null');
         }
-        $this->path = $path;
+        $this->path = $this->formatFileName($path);
         $this->dir = dirname($this->path);
         $this->async = $async;
     }
@@ -49,5 +49,21 @@ class FileWriter implements ILogWriter, Async {
             return;
         }
         call_user_func($this->callback, TRUE);
+    }
+
+    /**
+     * @param $path
+     * @return mixed
+     */
+    protected function formatFileName($path) {
+        $matched = NULL;
+        //处理日期格式
+        preg_match('/\%([^\%]+)\%/', $path, $matched);
+        if ($matched && is_array($matched)) {
+            $subject = $matched[0];
+            $date_format = $matched[1];
+            $path = str_replace($subject, date($date_format), $path);
+        }
+        return $path;
     }
 }
