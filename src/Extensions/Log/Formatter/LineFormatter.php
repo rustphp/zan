@@ -1,6 +1,6 @@
 <?php
 namespace Zan\Framework\Extensions\Log\Formatter;
-use Zan\Framework\Utilities\Json\JSON;
+use Zan\Framework\Extensions\Json\JSON;
 
 /**
  * Formats incoming records into a one-line string
@@ -9,7 +9,7 @@ use Zan\Framework\Utilities\Json\JSON;
  *
  */
 class LineFormatter extends BaseFormatter {
-    const DEFAULT_FORMAT = "[%datetime%] %message% %context% %extra%\n";
+    const DEFAULT_FORMAT = "[%time%] %channel% %message% %context% %extra%\n";
     protected $format;
     protected $allowInlineLineBreaks;
     protected $includeStacktraces;
@@ -18,7 +18,6 @@ class LineFormatter extends BaseFormatter {
      * @param string $format The format of the message
      * @param string $dateFormat The format of the timestamp: one supported by DateTime::format
      * @param bool   $allowInlineLineBreaks Whether to allow inline line breaks in log entries
-     * @param bool   $ignoreEmptyContextAndExtra
      */
     public function __construct($format = NULL, $dateFormat = NULL, $allowInlineLineBreaks = FALSE) {
         $this->format = $format ?: static::DEFAULT_FORMAT;
@@ -36,11 +35,7 @@ class LineFormatter extends BaseFormatter {
     public function allowInlineLineBreaks($allow = TRUE) {
         $this->allowInlineLineBreaks = $allow;
     }
-
-    public function ignoreEmptyContextAndExtra($ignore = TRUE) {
-        $this->ignoreEmptyContextAndExtra = $ignore;
-    }
-
+    
     /**
      * @param array $records
      * @param bool  $isBatch

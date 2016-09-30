@@ -1,7 +1,5 @@
 <?php
 namespace Zan\Framework\Extensions\Log;
-use DateTimeImmutable;
-use DateTimeZone;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Zan\Framework\Foundation\Exception\System\InvalidArgumentException;
@@ -35,7 +33,6 @@ abstract class BaseLogger implements LoggerInterface {
      */
     protected $formatter = NULL;
     protected $logLevel  = 0;
-    protected $timezone  = NULL;
 
     /**
      * BaseLogger constructor.
@@ -49,7 +46,6 @@ abstract class BaseLogger implements LoggerInterface {
         $config = self::getConfigByKey($config_key);
         $this->config = $config;
         $this->logLevel = $config['level'];
-        $this->timezone = new DateTimeZone(date_default_timezone_get() ?: 'PRC');
         $this->name = $config['app'];
     }
 
@@ -186,14 +182,14 @@ abstract class BaseLogger implements LoggerInterface {
      */
     protected function getRecord($level, $message, $context = []) {
         $levelName = static::$levelMap[$level];
-        $dateTime = new DateTimeImmutable('now', $this->timezone);
+        $time = date('Y-m-d H:i:s.u');
         yield [
             'message'    => $message,
             'context'    => $context,
             'level'      => $level,
             'level_name' => $levelName,
             'channel'    => $this->name,
-            'datetime'   => $dateTime,
+            'time'       => $time,
             'extra'      => [],
         ];
     }
@@ -235,7 +231,6 @@ abstract class BaseLogger implements LoggerInterface {
         }
         if (isset($config['query'])) {
             parse_str($config['query'], $params);
-            $params = self::fixBooleanValue($params);
             $result = Arr::merge($result, $params);
         }
         if (!$result['module']) {
@@ -247,25 +242,5 @@ abstract class BaseLogger implements LoggerInterface {
         // force set app value to Application name
         $result['app'] = Application::getInstance()->getName();
         return $result;
-    }
-
-    /**
-     * @param $params
-     * @return mixed
-     */
-    private static function fixBooleanValue($params) {
-        if (empty($params)) {
-            return $params;
-        }
-        foreach ($params as $key => $val) {
-            if ($val == "true") {
-                $params[$key] = TRUE;
-            } else {
-                if ($val == "false") {
-                    $params[$key] = FALSE;
-                }
-            }
-        }
-        return $params;
     }
 }
