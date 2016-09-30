@@ -9,15 +9,12 @@
 namespace Zan\Framework\Foundation\Exception;
 
 use Zan\Framework\Contract\Foundation\ExceptionHandler;
-use Zan\Framework\Foundation\Exception\Handler\ExceptionLogger;
+use Zan\Framework\Extensions\Log\FileLogger;
 use Zan\Framework\Network\Http\Response\BaseResponse;
-use swoole_http_response as SwooleHttpResponse;
 
 class ExceptionHandlerChain
 {
-    protected $handlerChain = [
-        ExceptionLogger::class,
-    ];
+    protected $handlerChain = [];
     protected $handlerMap = [];
 
     public function __construct()
@@ -33,6 +30,8 @@ class ExceptionHandlerChain
 
     public function handle(\Exception $e)
     {
+        $logger = new FileLogger('error');
+        yield $logger->error($e->getMessage());
         if (empty($this->handlerChain)) {
             //@TODO 输出到console
             return;
