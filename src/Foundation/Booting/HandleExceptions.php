@@ -23,7 +23,7 @@ class HandleExceptions implements Bootable
     {
         $this->app = $app;
 
-        error_reporting(-1);
+        error_reporting(E_ALL);
 
         set_error_handler([$this, 'handleError']);
 
