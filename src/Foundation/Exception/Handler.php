@@ -5,6 +5,7 @@ use Zan\Framework\Foundation\Core\Debug;
 
 class Handler {
     public static function initErrorHandler() {
+        error_reporting(E_ALL);
         ini_set('display_errors', FALSE);
         if (Debug::get()) {
             set_exception_handler(['Handler', 'handleException']);
