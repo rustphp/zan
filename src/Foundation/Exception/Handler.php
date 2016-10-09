@@ -19,6 +19,7 @@ class Handler {
     public static function handleException(\Exception $e) {
         $logger = new FileLogger('error');
         yield $logger->error($e);
+        return TRUE;
     }
 
     public static function handleExceptionProduct(\Exception $e) {
@@ -26,17 +27,13 @@ class Handler {
     }
 
     public static function handleError($code, $message, $file, $line) {
-        if ($code & error_reporting()) {
-            $exception = new \Exception($message, 9999, $code, $file, $line);
-            Handler::handleException($exception);
-            return TRUE;
-        }
-        return FALSE;
+        $exception = new \Exception($message, 9999, $code, $file, $line);
+        return Handler::handleException($exception);
     }
 
     public static function handleFatalError() {
         $error = error_get_last();
-        if ($error && self::isLevelFatal($error['type'])) {
+        if ($error) { //&& self::isLevelFatal($error['type'])
             Handler::handleError($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }
