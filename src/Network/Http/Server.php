@@ -16,19 +16,19 @@
  */
 namespace Zan\Framework\Network\Http;
 
-use Zan\Framework\Network\Http\ServerStart\InitializeRouter;
-use Zan\Framework\Network\Http\ServerStart\InitializeUrlConfig;
-use Zan\Framework\Network\Http\ServerStart\InitializeUrlRule;
-use Zan\Framework\Network\Http\ServerStart\InitializeMiddleware;
-use Zan\Framework\Network\Http\ServerStart\InitializeCache;
-use Zan\Framework\Network\Http\ServerStart\InitializeExceptionHandlerChain;
-use Zan\Framework\Network\Server\WorkerStart\InitializeConnectionPool;
-use swoole_http_server as SwooleServer;
 use swoole_http_request as SwooleHttpRequest;
 use swoole_http_response as SwooleHttpResponse;
+use swoole_http_server as SwooleServer;
 use Zan\Framework\Contract\Network\Server as ServerContract;
-use Zan\Framework\Network\Server\ServerBase;
+use Zan\Framework\Network\Http\ServerStart\InitializeCache;
+use Zan\Framework\Network\Http\ServerStart\InitializeExceptionHandlerChain;
+use Zan\Framework\Network\Http\ServerStart\InitializeMiddleware;
+use Zan\Framework\Network\Http\ServerStart\InitializeRouter;
 use Zan\Framework\Network\Http\ServerStart\InitializeSqlMap;
+use Zan\Framework\Network\Http\ServerStart\InitializeUrlConfig;
+use Zan\Framework\Network\Http\ServerStart\InitializeUrlRule;
+use Zan\Framework\Network\Server\ServerBase;
+use Zan\Framework\Network\Server\WorkerStart\InitializeConnectionPool;
 
 class Server extends ServerBase implements ServerContract
 {
@@ -106,7 +106,7 @@ class Server extends ServerBase implements ServerContract
 
     public function onWorkerError($swooleServer, $workerId, $workerPid, $exitCode)
     {
-        echo "http worker error ..... \n";
+        echo 'worker error:' . date('Y-m-d H:i:s') . '|' . $exitCode . '|' . $workerId . '|' . $workerPid . '|' . $swooleServer->getLastError() . "\n";
     }
 
     public function onRequest(SwooleHttpRequest $swooleHttpRequest, SwooleHttpResponse $swooleHttpResponse)
