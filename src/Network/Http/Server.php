@@ -95,13 +95,13 @@ class Server extends ServerBase implements ServerContract
 
     public function onWorkerStart($swooleServer, $workerId)
     {
-        echo "http worker start ..... \n";
+        echo "http worker($workerId) start ..... \n";
         $this->bootWorkerStartItem($workerId);
     }
 
     public function onWorkerStop($swooleServer, $workerId)
     {
-        echo "http worker stop ..... \n";
+        echo "http worker($workerId) stop ..... \n";
     }
 
     public function onWorkerError($swooleServer, $workerId, $workerPid, $exitCode)
